@@ -13,7 +13,7 @@ function [e, p, j_p] = trackError(N, xiRef, centerPoints, xiPred)
     p = cell(1, size(xiPred, 2));
     j_p = cell(1, size(xiPred, 2));
 
-    for i = 1:N
+    for i = 1: N
         e{i} = xiPred(1:2, i)-xiRef(1:2, i);
         xDiff = xiPred(1:2, i)-centerPoints(:, i);
         angle = atan((centerPoints(2, i+1)-centerPoints(2, i))/...

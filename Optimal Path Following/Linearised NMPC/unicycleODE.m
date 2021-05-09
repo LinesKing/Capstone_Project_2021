@@ -8,7 +8,7 @@ function [dxidt] = unicycleODE(t, xi, u)
 %%%% Output: delta_u, delta_xi
 %%%%    dxidt: time derivative of states
 
-    dxidt = zeros(4,1);
+    dxidt = zeros(4, 1);
     dxidt(1) = xi(4)*cos(xi(3));
     dxidt(2) = xi(4)*sin(xi(3));
     dxidt(3) = u(1);

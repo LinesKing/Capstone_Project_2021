@@ -9,10 +9,10 @@ function [Ad, Bd] = unicycleMatrices(xiPred, N, T)
 %%%%    Ad: Discrete state matrices
 %%%%    Bd: Discrete input matrices
 
-    Ad = cell(1,N);
-    Bd = cell(1,N);
+    Ad = cell(1, N);
+    Bd = cell(1, N);
     % Generate state matrices
-    for i = 1:N
+    for i = 1: N
         Ad{i} = [1, 0, -T*xiPred(4,i)*sin(xiPred(3,i)), T*cos(xiPred(3,i));
                 0, 1, T*xiPred(4,i)*cos(xiPred(3,i)), T*sin(xiPred(3,i));
                 0, 0, 1, 0;
@@ -20,7 +20,7 @@ function [Ad, Bd] = unicycleMatrices(xiPred, N, T)
     end
 
     % Generate input matrices
-    for i = 1:N
+    for i = 1: N
         Bd{i} = [-(T^2*xiPred(4,i)*sin(xiPred(3,i)))/2, (T^2*cos(xiPred(3,i)))/2;
                 (T^2*xiPred(4,i)*cos(xiPred(3,i)))/2, (T^2*sin(xiPred(3,i)))/2;
                 T, 0;

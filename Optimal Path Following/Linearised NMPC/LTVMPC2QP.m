@@ -36,7 +36,7 @@ function [Pmat, qmat, Aineq, l, u, Aeq, c] = LTVMPC2QP(N, Q, R, nState, ...
     % Formulate P matrix
     Pmat = zeros((N+1)*nState + (N+1)*nInput, (N+1)*nState + (N+1)*nInput);
     % State section of P matrix
-    for i = 1:N
+    for i = 1: N
         Pmat(i*nState+1:(i+1)*nState, i*nState+1:(i+1)*nState) = J_err' * Q * J_err;
     end
     % Input section of P matrix
@@ -51,11 +51,11 @@ function [Pmat, qmat, Aineq, l, u, Aeq, c] = LTVMPC2QP(N, Q, R, nState, ...
     % Formulate q matrix
     qmat = zeros((N+1)*nState + (N+1)*nInput,1);
     % State section of q matrix
-    for i = 1:N
+    for i = 1: N
         qmat(i*nState+1:(i+1)*nState,1) = 2*J_err'*Q*e{i};
     end
     % Input section of q matrix
-    for i = 1:N+1
+    for i = 1: N+1
         if i == 1
             qmat((N+1)*nState+1:(N+1)*nState+nInput,1) = 2*(-R*(uPred(:,2) - uPred(:,1)));
         elseif i == N+1
@@ -73,7 +73,7 @@ function [Pmat, qmat, Aineq, l, u, Aeq, c] = LTVMPC2QP(N, Q, R, nState, ...
     % Equality constraint for initial input
     Aeq(nState+1:nState+nInput, (N+1)*nState+1:(N+1)*nState+nInput) = eye(nInput);
     % Equality constraints for system dynamics
-    for i = 0:N-1
+    for i = 0: N-1
         % State matrix component of constraint
         Aeq(nState+nInput+i*nState+1:nState+nInput+(i+1)*nState, i*nState+1:(i+1)*nState) = Ad{i+1};
         % Input matrix component of constraint
@@ -89,8 +89,8 @@ function [Pmat, qmat, Aineq, l, u, Aeq, c] = LTVMPC2QP(N, Q, R, nState, ...
     Aineq = zeros(N*(nState) + N*(nInput), (N+1)*(nState) + (N+1)*(nInput));
     % State section of Aineq matrix
 
-    for i = 1:N
-        Aineq((i-1)*nState+1:i*nState, i*nState+1:(i+1)*nState,1) = blkdiag(j_p{i},eye(2));  % [J_p; A_eta; A_beta];
+    for i = 1: N
+        Aineq((i-1)*nState+1:i*nState, i*nState+1:(i+1)*nState,1) = blkdiag(j_p{i}, eye(2));  % [J_p; A_eta; A_beta];
     end
     % Input section of Aineq matrix
     Aineq(N*nState+1:end, (N+1)*nState+nInput+1:end) = kron(eye(N), eye(nInput));
@@ -98,24 +98,24 @@ function [Pmat, qmat, Aineq, l, u, Aeq, c] = LTVMPC2QP(N, Q, R, nState, ...
     % Formulate lower inequality bound
     l = zeros(N*nState + N*nInput,1);
     % state component of lower inequality bound
-    for i = 1:N
+    for i = 1: N
         l((i-1)*nState+1:(i-1)*nState+nPosition,1) = [-0.18 -0.1]'-p{i};
         l((i-1)*nState+nPosition+1:(i-1)*nState+nPosition+nEta,1) = etaMin - xiPred(nPosition+1:nPosition+nEta,i+1);
     end
     % input component of lower inequality bound
-    for i = 0:N-1
+    for i = 0: N-1
         l(N*nState+i*nInput+1:N*nState+i*nInput+nInput,1) = uMin - uPred(1:nInput,i+2);
     end
 
     % Formulate upper inequality bound
     u = zeros(N*nState + N*nInput,1);
     % state component of upper inequality bound
-    for i = 1:N
+    for i = 1: N
         u((i-1)*nState+1:(i-1)*nState+nPosition,1) = [0.18 0.1]'-p{i} ;
         u((i-1)*nState+nPosition+1:(i-1)*nState+nPosition+nEta,1) = etaMax - xiPred(nPosition+1:nPosition+nEta,i+1);
     end
     % input component of upper inequality bound
-    for i = 0:N-1
+    for i = 0: N-1
         u(N*nState+i*nInput+1:N*nState+i*nInput+nInput,1) = uMax - uPred(1:nInput,i+2);
     end
 end

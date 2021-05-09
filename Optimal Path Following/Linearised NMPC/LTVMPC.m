@@ -29,8 +29,8 @@ function [uPred, xiPred, epsCurr] = LTVMPC(Q, R, N, M, T, xiRef, ...
         if M > 1
             % Take average of inputs ((M * N) as (1 * N)) inside iteration 
             % to be next guess for uPred
-            uPred(1,1:N+1) = mean(omegaGuessCurrStepHis(1:j,:), 1);
-            uPred(2,1:N+1) = mean(aGuessCurrStepHis(1:j,:), 1);
+            uPred(1, 1:N+1) = mean(omegaGuessCurrStepHis(1:j,:), 1);
+            uPred(2, 1:N+1) = mean(aGuessCurrStepHis(1:j,:), 1);
         end
         
         % Calculate predicted states
@@ -47,7 +47,7 @@ function [uPred, xiPred, epsCurr] = LTVMPC(Q, R, N, M, T, xiRef, ...
         uMin = [constr.omegaMin; constr.aMin];
         uMax = [constr.omegaMax; constr.aMax];
                 
-        [e, p, j_p] = trackError(N,xiRef(:,2:N+1),centerPoints(:,1:N+1),xiPred(:,2:N+1));
+        [e, p, j_p] = trackError(N, xiRef(:,2:N+1), centerPoints(:,1:N+1), xiPred(:,2:N+1));
         
         [P_qp, q_qp, Aineq_qp,l_qp, u_qp, Aeq_qp, c_qp] = ...
             LTVMPC2QP(N, Q, R, nState,nPosition, nEta, nInput,  ...
