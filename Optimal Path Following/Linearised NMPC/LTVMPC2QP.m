@@ -32,12 +32,11 @@ function [Pmat, qmat, Aineq, l, u, Aeq, c] = LTVMPC2QP(N, Q, R, nState, ...
 %%%%    Aeq: Aeq in QP
 %%%%    c: c in QP
 
-    J_err = [1 0 0 0; 0 1 0 0];
     % Formulate P matrix
     Pmat = zeros((N+1)*nState + (N+1)*nInput, (N+1)*nState + (N+1)*nInput);
     % State section of P matrix
     for i = 1: N
-        Pmat(i*nState+1:(i+1)*nState, i*nState+1:(i+1)*nState) = J_err' * Q * J_err;
+        Pmat(i*nState+1:(i+1)*nState, i*nState+1:(i+1)*nState) = Q;
     end
     % Input section of P matrix
     I1blk = [-eye(nInput); eye(nInput)];
@@ -52,7 +51,7 @@ function [Pmat, qmat, Aineq, l, u, Aeq, c] = LTVMPC2QP(N, Q, R, nState, ...
     qmat = zeros((N+1)*nState + (N+1)*nInput,1);
     % State section of q matrix
     for i = 1: N
-        qmat(i*nState+1:(i+1)*nState,1) = 2*J_err'*Q*e{i};
+        qmat(i*nState+1:(i+1)*nState,1) = 2*Q*[e{i}; 0; 0];
     end
     % Input section of q matrix
     for i = 1: N+1

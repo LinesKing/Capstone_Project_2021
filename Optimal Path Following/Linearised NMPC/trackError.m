@@ -5,8 +5,8 @@ function [e, p, j_p] = trackError(N, xiRef, centerPoints, xiPred)
 %%%%    xiRef: Reference value of state.
 %%%%    xiPred: Predicted value of state.
 %%%% Output: e, p, j_p
-%%%%    e: Error vectors.
-%%%%    p: Error vectors in Frenet coordinate.
+%%%%    e: Error vectors  of position.
+%%%%    p: Error vectors of position in Frenet coordinate.
 %%%%    j_p: Transition matrix between Global and Frenet coordinate.
 
     e = cell(1, size(xiPred, 2));

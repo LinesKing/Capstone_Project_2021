@@ -41,7 +41,8 @@ outerPoints = [xOuter; yOuter];
 xRef = xPath;
 yRef = yPath;
 thetaRef = zeros(1, length(xPath));
-xiRef = [xPath; yPath];
+vRef = zeros(1, length(xPath));
+xiRef = [xPath; yPath; thetaRef; vRef];
 
 % Bound constraint of track
 xTrackMin = min([xInner, xOuter]);
@@ -99,7 +100,7 @@ xiPred = zeros(length(xi), N+1); % guess for states across horizon
 uPred = repmat(u, 1, N+1); % guess for inputs across horizon
 
 % Specify Weights
-Q = 20*diag([1 1]); % [x weight, y weight, theta weight, v weight]
+Q = 20*diag([1 1 0 0]); % [x weight, y weight, theta weight, v weight]
 R = 5*diag([1 1]); % [omega weight, a weight]
 
 % Test LTV MPC for different horizons
@@ -121,11 +122,12 @@ uHis = []; % History of implemented inputs
 xiHis = xi; % History of implemented states
 epsSim = []; % Record array of epsilons
 tspan = [0 0];
-% fprintf('Simulation Progress:         ')
 
+% Fill references and center points
 xiRef = [xiRef, xiRef(:, 1:N)];
 centerPoints = [centerPoints, centerPoints(:, 1:N)];
 
+% fprintf('Simulation Progress:         ')
 for k = 1: length(times) % starting off at first time already (not zeroth)
     % fprintf('\b\b\b\b\b\b\b\b%6.2f %%',(i/(length(TIME)-1)*100));
     
