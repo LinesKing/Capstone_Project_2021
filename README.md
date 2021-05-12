@@ -21,7 +21,25 @@
 
 <!-- OPTIMAL PATH FOLLOWING -->
 ## Optimal Path Following
+<<<<<<< HEAD
 We both use N = 20, Q = 20*diag([1 1 0 0]), R = 5*diag([1 1]).
+=======
+We both use N = 20, 
+$Q = \begin{bmatrix}
+20 & 0 & 0 & 0\\
+0 & 20 & 0 & 0\\
+0 & 0 & 0 & 0\\
+0 & 0 & 0 & 0
+\end{bmatrix}$, 
+$Q = \begin{bmatrix}
+5 & 0\\
+0 & 5
+\end{bmatrix}$, 
+
+$\begin{bmatrix} u\\e \end{bmatrix}  \sim 
+N (\begin{bmatrix}0\\0\end{bmatrix},
+\begin{bmatrix} G(\sigma_g) &0\\ 0 &R(\sigma_{\gamma})\end{bmatrix})$
+>>>>>>> main
 
 ### Linearised NMPC
 
