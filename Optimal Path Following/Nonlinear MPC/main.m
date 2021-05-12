@@ -91,7 +91,7 @@ controller = NMPC(N, iterMax, T ,Q, R, constr);
 %% MPC Simulation
 uHis = []; % History of implemented inputs
 xiHis = xi; % History of implemented states
-epsSim = []; % Record array of epsilons, corresponding to norm of 
+epsSim = []; % Record array of epsilons
 tspan = [0 0];
 
 % Fill references and center points
@@ -109,6 +109,10 @@ record.uHis = zeros(nInput,N+1);
 for k = 1: length(times) % starting off at first time already (not zeroth)
     % fprintf('\b\b\b\b\b\b\b\b%6.2f %%',(i/(length(TIME)-1)*100));
     
+    % Record U over iterations
+    omegaGuessCurrStepHis = uPred(1,1:N+1);
+    aGuessCurrStepHis = uPred(2,1:N+1);
+        
     % Add current references
     record.refs{k} = xiRef(:, k:k+N);
     
@@ -122,6 +126,10 @@ for k = 1: length(times) % starting off at first time already (not zeroth)
     uPred = solutions{1};
     xiPred = solutions{2};
     
+    % Record epsilon over iterations
+    epsCurr = norm([uPred(1,1:N+1) - omegaGuessCurrStepHis;
+                    uPred(2,1:N+1) - aGuessCurrStepHis], 2);
+                     
     % Input guesses when i = 1
     if (k == 1)
         record.uPred{k} = uPred(:,:);
@@ -137,6 +145,7 @@ for k = 1: length(times) % starting off at first time already (not zeroth)
     % Update history
     uHis = [uHis, uPred(:,2)];
     xiHis = [xiHis,xi];
+    epsSim = [epsSim, epsCurr];  % update epsilons
     
     % Plot position states inside simulation
     if flagPlot
@@ -176,10 +185,12 @@ for k = 1: length(times) % starting off at first time already (not zeroth)
     % Prepare guess of inputs and states along horizon for next iteration
     uPred = [uPred(:,2:N+1), uPred(:,N+1)];
     xiPred = [xi, zeros(length(xi), N)];
+    
 end
 
 % Average of final input differences at each time
 eps_avg = mean(epsSim);
+MSE = immse(xiHis(1:2, 1:length(xRef)), xiRef(1:2, 1:length(xRef)));
 fprintf('\n')
 
 %% Plot System, States and Inputs

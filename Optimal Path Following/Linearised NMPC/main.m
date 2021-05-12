@@ -73,7 +73,7 @@ constr.omegaMax = 5; % max angular velocity
 constr.omegaMin = -constr.omegaMax; % Min angular velocity
 
 %% MPC setting
-N = 16;  % length of horizon
+N = 20;  % length of horizon
 M = 1;  % number of iterations to repeat LTV for single time
 T = 0.05;  % aampling period
 tspan = [0 0];  % loop through times
@@ -188,6 +188,7 @@ end
 
 % Average of final input differences at each time
 eps_avg = mean(epsSim);
+MSE = immse(xiHis(1:2, 1:length(xRef)), xiRef(1:2, 1:length(xRef)));
 fprintf('\n')
 
 %% Plot Positions, States and Inputs
