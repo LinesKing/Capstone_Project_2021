@@ -33,7 +33,9 @@ $Q = \begin{bmatrix}
 0 & 5
 \end{bmatrix}$, 
 
-
+$\begin{bmatrix} u\\e \end{bmatrix}  \sim 
+N (\begin{bmatrix}0\\0\end{bmatrix},
+\begin{bmatrix} G(\sigma_g) &0\\ 0 &R(\sigma_{\gamma})\end{bmatrix})$
 
 ### Linearised NMPC
 
