@@ -75,7 +75,7 @@ constr.omegaMin = -constr.omegaMax; % Min angular velocity
 %% MPC setting
 N = 20;  % length of horizon
 M = 1;  % number of iterations to repeat LTV for single time
-T = 0.05;  % aampling period
+T = 0.05;  % sampling period
 tspan = [0 0];  % loop through times
 
 % Set simulation time
