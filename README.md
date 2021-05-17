@@ -21,7 +21,7 @@
 
 <!-- OPTIMAL PATH FOLLOWING -->
 ## Optimal Path Following
-We both use N = 20, Q = 20*diag([1 1 0 0]), R = 5*diag([1 1]).
+We both use N = 20, Q = 20\*diag([1 1 0 0]), R = 5\*diag([1 1]).
 
 ### Linearised NMPC
 
