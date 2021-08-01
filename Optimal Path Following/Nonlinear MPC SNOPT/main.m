@@ -125,7 +125,7 @@ for k = 1: length(times) % starting off at first time already (not zeroth)
     end
     
     % Slove noncovex optimisation problems
-    solutions = controller{xiRef(:,k:k+N), xi, u};
+    [solutions,~,~,~,controller] = controller{xiRef(:,k:k+N), xi, u};
     uPred = solutions{1};
     xiPred = solutions{2};
     

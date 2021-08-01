@@ -73,7 +73,7 @@ end
 parametersIn = {[r{:}], xi0, u0};
 solutionsOut = {[u{:}], [xi{:}]};
 %ops = sdpsettings('solver','ipopt');
-ops = sdpsettings('solver','snopt');
+ops = sdpsettings('solver','snopt','usex0',1);
 % ops = sdpsettings('solver','fmincon');
 controller = optimizer(constraints, objective, ops, ...
                         parametersIn, solutionsOut);

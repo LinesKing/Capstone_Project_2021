@@ -73,7 +73,7 @@ end
 parametersIn = {[r{:}], xi0, u0};
 solutionsOut = {[u{:}], [xi{:}]};
 %ops = sdpsettings('solver','ipopt');
-ops = sdpsettings('solver','ipopt');
+ops = sdpsettings('solver','ipopt','usex0',1);
 ops.ipopt.max_iter = iterMax;
 % ops = sdpsettings('solver','fmincon');
 controller = optimizer(constraints, objective, ops, ...
