@@ -2,7 +2,7 @@ function [Ad, Bd] = unicycleMatrices(xiPred, N, T)
 %%%% This function is to generate state and input matrices for each column
 %%%% of the array xiPred (each column is new set of states)
 %%%% Input:
-%%%%    xiPred: 4xN array of states along horizon
+%%%%     xiPred: 4xN array of states along horizon
 %%%%     N: Length of horizon
 %%%%     T: Sampling period
 %%%% Output:
