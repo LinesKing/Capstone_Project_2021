@@ -7,38 +7,24 @@ clear all;
 close all;
 
 %% Basic setting
+% Load track a
+% load('../tracks/track_a.mat');
+% centerPoints = round(track_a.center,4);
+% innerPoints = round(track_a.inner,4);
+% outerPoints = round(track_a.outer,4);
+
+% Load track b
+load('../tracks/track_b.mat');
+centerPoints = round(track_b.center,4);
+innerPoints = round(track_b.inner,4);
+outerPoints = round(track_b.outer,4);
+
 % Choose starting N point
 starting_N_point = 1;
 
 % Receeding Horizon
-N = 664; % 664 for track a; 150 for track b
+N = length(centerPoints)-1;
 ending_N_point = starting_N_point + N;
-
-%% Load path, outer boundary and center of track.
-
-% Load track a
-load('../tracks/track_a.mat');
-centerPoints = round(track_a.center,4);
-innerPoints = round(track_a.inner,4);
-outerPoints = round(track_a.outer,4);
-
-% Enable warm start of optimal path
-% load('../warm_start/warm_start_track_a.mat');
-% warm = struct();
-% warm.xWarm = x_warm(1,starting_N_point:ending_N_point);
-% warm.yWarm = y_warm(2,starting_N_point:ending_N_point);
-
-% Load track b
-% load('../tracks/track_b.mat');
-% centerPoints = round(track_b.center,4);
-% innerPoints = round(track_b.inner,4);
-% outerPoints = round(track_b.outer,4);
-
-% Enable warm start of optimal path
-% load('../warm_start/warm_start_track_b.mat');
-% warm = struct();
-% warm.xWarm = x_warm(1,starting_N_point:ending_N_point);
-% warm.yWarm = y_warm(2,starting_N_point:ending_N_point);
 
 % Enable warm start with center points
 warm = struct();
@@ -65,27 +51,8 @@ for i = 1:N+1
 end
 
 %% Obstacle constraints
-
-% Obstacle Parameters A1 %section 1 1,66
-origin = [-0.08, 0.3]';
-theta = deg2rad(-45);
-length = 0.1;
-width = 0.1;
-
-% Obstacle Parameters A1 %section 5 170,50
-origin = [1.2, 0.3]';
-theta = deg2rad(0);
-length = 0.1;
-width = 0.1;
-
-% Obstacle Parameters A1 %section 6 220,40
-origin = [0.72, -0.6]';
-theta = deg2rad(0);
-length = 0.1;
-width = 0.1;
-
-% % Obstacle Parameters A2 %section 9 350,30
-origin = [-0.45, -0.98]';
+% % Obstacle Parameters
+origin = [-0.65, -0.98]';
 theta = deg2rad(0);
 length = 0.1;
 width = 0.1;
@@ -116,8 +83,8 @@ axis([min(min(xInner), min(xOuter)) ...
     max(max(yInner), max(yOuter))]);
 hold on
 
-axis([-1.5 2 -2 2]) 
-pause()
+%axis([-1.5 2 -2 2]) 
+%pause()
 
 %% Solving optimal problem
 % Initial Starting Point
@@ -125,7 +92,10 @@ initAngle = atan2(warm.yWarm(2)-warm.yWarm(1), warm.xWarm(2)-warm.xWarm(1));
 init = [warm.xWarm(1), warm.yWarm(1), initAngle]; 
 
 % Solve optimal path
-solution = OBCAPathPlanning(xInnerMargin, yInnerMargin, xOuterMargin, yOuterMargin, warm, init, object, dMin);
+profile on
+solution = OBCATimeOptimalPathPlanning(xInnerMargin, yInnerMargin, xOuterMargin, yOuterMargin, warm, init, object, dMin);
+profile viewer
+profile off
 
 % Extract Optimal Path
 xPath = solution(:, 1);
