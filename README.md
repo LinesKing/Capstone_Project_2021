@@ -46,25 +46,25 @@ We both use N = 20, Q = 20\*diag([1 1 0 0]), R = 5\*diag([1 1]).
   </a>
 </p>
 
-### Nonlinear MPC
+### Nonlinear MPC IPOPT
 
 <br />
 <p align="center">
   <a href="https://github.com/LinesKing/Capstone_Project_2021">
-    <img src="Optimal Path Following/Nonlinear MPC/histroy of position and track.jpg" alt="History of position and track in nonlinear MPC" width="560" height="420">
+    <img src="Optimal Path Following/Nonlinear MPC IPOPT/histroy of position and track.jpg" alt="History of position and track in nonlinear MPC" width="560" height="420">
   </a>
 </p>
 
 <br />
 <p align="center">
   <a href="https://github.com/LinesKing/Capstone_Project_2021">
-    <img src="Optimal Path Following/Nonlinear MPC/history of state.jpg" alt="History of state in nonlinear MPC" width="560" height="420">
+    <img src="Optimal Path Following/Nonlinear MPC IPOPT/history of state.jpg" alt="History of state in nonlinear MPC" width="560" height="420">
   </a>
 </p>
 
 <br />
 <p align="center">
   <a href="https://github.com/LinesKing/Capstone_Project_2021">
-    <img src="Optimal Path Following/Nonlinear MPC/history of input.jpg" alt="History of input in nonlinear MPC" width="560" height="420">
+    <img src="Optimal Path Following/Nonlinear MPC IPOPT/history of input.jpg" alt="History of input in nonlinear MPC" width="560" height="420">
   </a>
 </p>
