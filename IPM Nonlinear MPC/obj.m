@@ -1,4 +1,9 @@
-%% Objective function value
 function [ob] = obj(x)
-ob = x(2)*(5+x(1));
+%%%% This function is to achieve the objective function value
+%%%% Input: x
+%%%%    x - primal variable
+%%%% Output: ob
+%%%%    ob: object
+
+    ob = x(2)*(5+x(1));
 end
