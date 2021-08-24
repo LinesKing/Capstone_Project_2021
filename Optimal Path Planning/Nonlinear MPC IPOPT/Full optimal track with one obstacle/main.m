@@ -93,7 +93,7 @@ init = [warm.xWarm(1), warm.yWarm(1), initAngle];
 
 % Solve optimal path
 profile on
-solution = OBCATimeOptimalPathPlanning(xInnerMargin, yInnerMargin, xOuterMargin, yOuterMargin, warm, init, object, dMin);
+solution = OBCAOneObsTimeOptimalPathPlanning(xInnerMargin, yInnerMargin, xOuterMargin, yOuterMargin, warm, init, object, dMin);
 profile viewer
 profile off
 

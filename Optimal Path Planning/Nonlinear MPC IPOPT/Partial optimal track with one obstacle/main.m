@@ -57,7 +57,7 @@ for i = 1:N+1
     yOuterMargin(i) = (1-t)*yOuter(i) + t*yInner(i);
 end
 
-%% Plotting obstacle and track
+%% Plotting track
 % Plot track bounds with margin
 figure(1)
 hold on
@@ -104,7 +104,7 @@ object.b = b;
 % Choose d_min
 dMin = 0.05;
 
-%% Plotting obstacle and track
+%% Plotting obstacle
 figure(1); 
 hold on; grid on;
 plotConvexRegion(-A,-b,[-1.5 -2],[4 2], 'g', 0.1)

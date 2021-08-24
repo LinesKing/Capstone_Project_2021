@@ -20,10 +20,11 @@ innerPoints = round(track_b.inner,4);
 outerPoints = round(track_b.outer,4);
 
 % Choose starting N point
-starting_N_point = 1;
+starting_N_point = 50;
 
 % Receeding Horizon
-N = length(centerPoints)-1;
+% N = length(centerPoints)-1;
+N = 30-1;
 ending_N_point = starting_N_point + N;
 
 % Enable warm start with center points
