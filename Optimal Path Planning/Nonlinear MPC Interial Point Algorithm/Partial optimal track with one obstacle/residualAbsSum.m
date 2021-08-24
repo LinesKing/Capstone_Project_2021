@@ -1,4 +1,4 @@
-function [th] = theta(x,s,bL,bU)
+function [theta] = residualAbsSum(x,s,bL,bU,auxdata)
 %%%% This function is sum of absolute value for residuals
 %%%% Input: x, s, bL, bU
 %%%%    x - primal variable
@@ -8,5 +8,5 @@ function [th] = theta(x,s,bL,bU)
 %%%% Output: th
 %%%%    th: time derivative of states
 
-    th = sum(abs(res(x,s,bL,bU)));
+    theta = sum(abs(constaintResidual(x,s,bL,bU,auxdata)));
 end

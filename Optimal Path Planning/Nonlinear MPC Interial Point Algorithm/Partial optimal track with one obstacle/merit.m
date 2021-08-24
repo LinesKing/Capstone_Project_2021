@@ -1,4 +1,4 @@
-function [me] = merit(bp,x,xL,xU,s,bL,bU)
+function [me] = merit(bp,x,xL,xU,s,bL,bU,auxdata)
 %%%% This function is the merit function
 %%%% Input: bp, x, xL, xU, s, bL, bU
 %%%%    bp - barrier problem
@@ -11,7 +11,7 @@ function [me] = merit(bp,x,xL,xU,s,bL,bU)
 %%%% Output: me
 %%%%    me: merit
 
-    ph = phi(bp,x,xL,xU,s,bL,bU);
-    r = res(x,s,bL,bU);
-    me = ph + bp.nu*sum(abs(r));
+    phi = barrierObjective(bp,x,xL,xU,s,bL,bU,auxdata);
+    r = constaintResidual(x,s,bL,bU,auxdata);
+    me = phi + bp.nu*sum(abs(r));
 end
