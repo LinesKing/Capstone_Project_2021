@@ -9,7 +9,7 @@ function [J] = constraintJacobian(x,bL,bU,auxdata)
 %%%%    J: jacobian matrix
 
     % Define Constants
-    [N, nStates, ~, ~, ~, xOuter, yOuter, xInner, yInner] = deal(auxdata{:});
+    [N, nStates, ~, ~, ~, ~, xOuter, yOuter, xInner, yInner] = deal(auxdata{:});
 
     % Number of constraints
     nConstraintsSystem = 4;

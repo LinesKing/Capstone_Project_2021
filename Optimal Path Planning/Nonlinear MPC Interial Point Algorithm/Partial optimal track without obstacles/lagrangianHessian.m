@@ -8,7 +8,7 @@ function [h] = lagrangianHessian(x,s,lam,auxdata)
 %%%%    h: hessian matrix
 
     % Define constants
-    [N, nStates, weightDist, weightVel] = deal(auxdata{1:4});
+    [N, nStates, weightDist, weightVel, weightAcc] = deal(auxdata{1:5});
     
     n = size(x,2);
     ns = size(s,2);
@@ -32,20 +32,22 @@ function [h] = lagrangianHessian(x,s,lam,auxdata)
             h(m+1,m+1) = 2*weightDist; h(m+1,m+1+nStates) = -2*weightDist;
             h(m+2,m+2) = 2*weightVel; h(m+2,m+2+nStates) = -2*weightVel; h(m+2,m+6) = -lam(k);
             h(m+3,m+3) = 2*weightVel; h(m+3,m+3+nStates) = -2*weightVel; h(m+3,m+6) = -lam(k+1);
-            h(m+4,m+6) = -lam(k+2);
-            h(m+5,m+6) = -lam(k+3);
+            h(m+4,m+4) = 2*weightVel; h(m+4,m+3+nStates) = -2*weightAcc; h(m+4,m+6) = -lam(k+2);
+            h(m+5,m+5) = 2*weightVel; h(m+5,m+3+nStates) = -2*weightAcc; h(m+5,m+6) = -lam(k+3);
         elseif (i == N+1)
             h(m,m) = 2*weightDist;
             h(m+1,m+1) = 2*weightDist;
             h(m+2,m+2) = 2*weightVel;
             h(m+3,m+3) = 2*weightVel;
+            h(m+4,m+4) = 2*weightAcc;
+            h(m+5,m+5) = 2*weightAcc;
         else
             h(m,m) = 4*weightDist; h(m,m+nStates) = -2*weightDist;
             h(m+1,m+1) = 4*weightDist; h(m+1,m+1+nStates) = -2*weightDist;
             h(m+2,m+2) = 4*weightVel; h(m+2,m+2+nStates) = -2*weightVel; h(m+2,m+6) = -lam(k);
             h(m+3,m+3) = 4*weightVel; h(m+3,m+3+nStates) = -2*weightVel; h(m+3,m+6) = -lam(k+1);
-            h(m+4,m+6) = -lam(k+2);
-            h(m+5,m+6) = -lam(k+3);
+            h(m+4,m+4) = 4*weightAcc; h(m+4,m+5+nStates) = -2*weightAcc; h(m+4,m+6) = -lam(k+2);
+            h(m+5,m+5) = 4*weightAcc; h(m+4,m+5+nStates) = -2*weightAcc; h(m+5,m+6) = -lam(k+3);
         end
         
         m = m + nStates;

@@ -1,4 +1,4 @@
-function [chi] = TimeOptimalPathPlanning(xInner, yInner, xOuter, yOuter, warm, initPoint)
+function [chi, ob_his] = TimeOptimalPathPlanning(xInner, yInner, xOuter, yOuter, warm, initPoint)
 %%%% This function is to find the optimal path by Large-scale Interior Point solution method.
 %%%% Input:
 %%%% 	xInner - Inner bound of x
@@ -16,21 +16,21 @@ function [chi] = TimeOptimalPathPlanning(xInner, yInner, xOuter, yOuter, warm, i
     prob.gamma = 0.5;
     prob.mu = 1;  % the initial barrier term
     prob.eta = 0.1;
-    prob.epsilon = 1e-8;
+    prob.epsilon = 1e-2;
 
     % maximum iterations
     prob.maxIter = 1000;
 
     prob.tauMax = 0.01; % update tau
-    prob.eTol = 1e-3;  % solution error tolerance
+    prob.eTol = 0.0011;  % solution error tolerance
     prob.k_mu  = 0.2; % check for new barrier problem (0,1)
     
     % Receeding horizon
     N = length(xOuter) - 1;
 
     % Max time between points (Must be chosen to something physcally poissble)
-    tMax = 0.2; 
-    tMin = 1e-4;
+    tMax = 0.1; 
+    tMin = 0.001;
 
     % Define state & input contraints
     vxMin = -2;
@@ -45,6 +45,7 @@ function [chi] = TimeOptimalPathPlanning(xInner, yInner, xOuter, yOuter, warm, i
     % Define objetive function weightings
     weightDist = 0.1; % 0.1
     weightVel = 0.5; % 0.5
+    weightAcc = 0;
     weightTime = 1; % 1
 
     % Define constants (number of variables)
@@ -54,7 +55,7 @@ function [chi] = TimeOptimalPathPlanning(xInner, yInner, xOuter, yOuter, warm, i
     nStates = nSystemStates + nControlInputs + nTimeVariable;
 
     % Set up the auxiliary data
-    auxdata = {N nStates weightDist weightVel weightTime xOuter yOuter xInner yInner};
+    auxdata = {N nStates weightDist weightVel weightAcc weightTime xOuter yOuter xInner yInner};
                
     %% Primal dual interior method
     % 1. Initialise decision variables with lower bounds and upper bounds
@@ -64,7 +65,7 @@ function [chi] = TimeOptimalPathPlanning(xInner, yInner, xOuter, yOuter, warm, i
     for i = 1:N+1
         % Set initial start point to center of track (warm start)
         % chi = [x, y, vx, vy, ax, ay, t]
-        chi = [chi, warm.xWarm(i), warm.yWarm(i), warm.vxWarm(i), warm.vyWarm(i), warm.axWarm(i), warm.ayWarm(i), warm.tWarm];
+        chi = [chi, warm.xWarm(i), warm.yWarm(i), warm.vxWarm(i), warm.vyWarm(i), warm.axWarm(i), warm.ayWarm(i), warm.tWarm(i)];
         % Upper and lower bounds of decision variables (box constraints)
         if (i == 1) % satisfy initial conditions contraint
             chiL = [chiL, [initPoint(1) initPoint(2) vxMin vyMin axMin ayMin]];
@@ -82,6 +83,8 @@ function [chi] = TimeOptimalPathPlanning(xInner, yInner, xOuter, yOuter, warm, i
         chiU = [chiU, tMax];
     end
     
+    chiL = chiL - prob.epsilon;
+    chiU = chiU + prob.epsilon;
     
     % 2. Initialise upper and lower bounds for constraints
     bL = [];
@@ -149,37 +152,44 @@ function [chi] = TimeOptimalPathPlanning(xInner, yInner, xOuter, yOuter, warm, i
     % 4. Initialise dual variables (variable constraint multipliers z)
     % zL = mu / (x-xL)
     for i = 1:nchi
-        zL(i) = prob.mu / (chi(i)-chiL(i)+prob.epsilon);
+        zL(i) = prob.mu / (chi(i)-chiL(i));
     end
     for i = 1:ns
-        zL(nchi+i) = prob.mu / (s(i)-sL(i)+prob.epsilon);
+        zL(nchi+i) = prob.mu / (s(i)-sL(i));
     end
     % zU = mu / (xU-x)
     for i = 1:nchi
-        zU(i) = prob.mu / (chiU(i)-chi(i)+prob.epsilon);
+        zU(i) = prob.mu / (chiU(i)-chi(i));
     end
     for i = 1:ns
-        zU(nchi+i) = prob.mu / (sU(i)-s(i)+prob.epsilon);
+        zU(nchi+i) = prob.mu / (sU(i)-s(i));
     end
     % Initialize objective gradient and constraint jacobian
     g = objectiveGradient(chi,s,auxdata);
     J = constraintJacobian(chi,bL,bU,auxdata);
     % Initialise dual variables (equality constraint multipliers lambda)
+%     [U,S,V] = svd(full(J*J'));
+%     S(end,end) = 1e-10;
+%     lambda = V * S^-1 * U' * J * (zL'-zU'-g');
     lambda = lsqminnorm(full(J*J'),J)*(zL'-zU'-g');
+%     lambda = pinv(full(J*J'))*J*(zL'-zU'-g');
     lambda = lambda';
 
     
     % 5. Prepare for iterations
     % Initial alpha for line search
-    alphaPr = 0.06;  % primal alpha
-    alphaDu = 0.06;  % dual alpha
-    alphaPrMax = 0.06;
-    alphaDuMax = 0.06;
+    alphaPr = 0.005;  % primal alpha
+    alphaDu = 0.005;  % dual alpha
+    alphaPrMax = 0.005;
+    alphaDuMax = 0.005;
     % Initialize iteration count
     iter = 0;
     % Print iteration zero
     iprint(prob,iter,chi,lambda,zL,zU,alphaPr,alphaDu,s,chiL,chiU,bL,bU,auxdata);
-
+    
+    ob = objective(chi,auxdata);
+    ob_his = [ob];
+    
     
     % 6. Start iterating
     for iter = 1:prob.maxIter
@@ -192,8 +202,8 @@ function [chi] = TimeOptimalPathPlanning(xInner, yInner, xOuter, yOuter, warm, i
         ZL = diag(zL);
         ZU = diag(zU);
         % Sigmas
-        dL = [chi-chiL+10-8 s-sL+10-8];
-        dU = [chiU-chi+10-8 sU-s+10-8];
+        dL = [chi-chiL s-sL];
+        dU = [chiU-chi sU-s];
         DL = diag(dL);
         DU = diag(dU);
         invDL = zeros(nchi+ns,nchi+ns);
@@ -221,10 +231,14 @@ function [chi] = TimeOptimalPathPlanning(xInner, yInner, xOuter, yOuter, warm, i
         b(1:nchi+ns,1) = g' + J'*lambda' - prob.mu*invDL*e + prob.mu*invDU*e;
         b(nchi+ns+1:nchi+ns+nc,1) = c(1:nc)';
         % compute search direction, solving Ax = b
-        d = lsqminnorm(A,-b);
+%         d = pinv(full(A))*(-b);
+        d = lsqminnorm(full(A),-b);
+%         [L,B,P] = ldl(full(A));
+%         d = P*(L'\(B\(L\(P'*(-b)))));
+        
         dchi = d(1:nchi);
         for i = 1:nchi
-            if chiL(i) == chiU(i)
+            if chiL(i) + prob.epsilon == chiU(i) - prob.epsilon
                 dchi(i) = 0;
             end
         end
@@ -275,15 +289,24 @@ function [chi] = TimeOptimalPathPlanning(xInner, yInner, xOuter, yOuter, warm, i
                 zUNew(i) = 0;
             end
         end
-
-
+        
         % Line search
         % Set alpha as approach to constraint
         alphaDu = min(alphaDu,alphaDuMax);
         alphaPr = min(alphaPr,alphaPrMax);
-            
+ 
+         % Recompute new points
+        chiNew = chi + alphaPr * dchi';
+        if (ns>=1)
+            sNew = s + alphaPr * ds';
+        else
+            sNew = [];
+        end
+        zLNew = zL + alphaDu * dzL';
+        zUNew = zU + alphaDu * dzU';
+        
         % Predicted and actual reduction in the merit function
-        pred = -alphaPr*g*[dchi;ds] - prob.gamma*alphaPr^2*[dchi;ds]'*H*[dchi;ds] + prob.nu*(norm(c',1)-norm(c'+alphaPr*J*[dchi;ds],1));
+        pred = -alphaPr*g*[dchi;ds] - prob.gamma*alphaPr^2*[dchi;ds]'*[dchi;ds] + prob.nu*(norm(c',1)-norm(c'+alphaPr*J*[dchi;ds],1));
         ared = merit(prob,chi,chiL,chiU,s,bL,bU,auxdata) - merit(prob,chiNew,chiL,chiU,sNew,bL,bU,auxdata);  
         
         % Compare actual reduction to predicted reduction as long as the 
@@ -292,8 +315,8 @@ function [chi] = TimeOptimalPathPlanning(xInner, yInner, xOuter, yOuter, warm, i
 
         while ared < prob.eta*pred 
             % reject point and move alpha_x
-            alphaPr = alphaPr * 0.5;
-            alphaDu = alphaDu * 0.5;
+            alphaPr = alphaPr * 0.9;
+            alphaDu = alphaDu * 0.9;
             % compute new points
             chiNew = chi + alphaPr * dchi';
             if (ns>=1)
@@ -333,14 +356,16 @@ function [chi] = TimeOptimalPathPlanning(xInner, yInner, xOuter, yOuter, warm, i
 
         % Check for convergence
         sMax = 100; % > 1
-        sD = max(sMax,(sum(abs(lambda))+sum(abs(zL))+sum(abs(zU)))/(nc+2*(nchi+ns)));
-        sC = max(sMax,(sum(abs(zU))+sum(abs(zL)))/(2*(nchi+ns)));
+        sD = max(100000,(sum(abs(lambda))+sum(abs(zL))+sum(abs(zU)))/(nc+2*(nchi+ns)));
+        sC = max(1000,(sum(abs(zU))+sum(abs(zL)))/(2*(nchi+ns)));
 
         part(1) = max(abs(g' + J'*lambda' - zL' + zU'))/sD;
-        part(2) = max(abs(lambda'.*c));
+        part(2) = max(abs(c))/sC;
         part(3) = max(abs(diag([chi-chiL s-sL])*diag(zL)*e - prob.mu*e))/sC;
         part(4) = max(abs(diag([chiU-chi sU-s])*diag(zU)*e - prob.mu*e))/sC;
-        eMu = max(part);        
+        eMu = max(part);
+        part
+        
         % Check for termination conditions
         if (eMu <= prob.eTol)
             fprintf(1,'\nSuccessful solution\n');
@@ -364,15 +389,24 @@ function [chi] = TimeOptimalPathPlanning(xInner, yInner, xOuter, yOuter, warm, i
         
 
         % reset alpha
-        alphaPr = 0.06;
-        alphaDu = 0.06;
+        alphaPr = 0.005;
+        alphaDu = 0.005;     
+        
+        % objective history
+        ob = objective(chi,auxdata);
+        ob_his = [ob_his ob];
+        
+        sol = reshape(chi,nStates,N+1)';
+        xPath = sol(:, 1);
+        yPath = sol(:, 2);
+        
+        % Plot path 
+        figure(1)
 
-        % don't do a line search in this MATLAB version
-        % just cycle through on another iteration with a lower alpha if
-        % the point was not accepted        
-
+        optimalPath = scatter(xPath, yPath, 'b*');
+        warmPath = scatter(warm.xWarm, warm.yWarm, 'r*');
     end
-
+    
     chi = reshape(chi,nStates,N+1)';
     
 end

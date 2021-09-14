@@ -9,7 +9,7 @@ function [r] = constaintResidual(x,s,bL,bU,auxdata)
 %%%%    r: residual
 
     % Define constants
-    [N, nStates, ~, ~, ~, xOuter, yOuter, xInner, yInner] = deal(auxdata{:});
+    [N, nStates, ~, ~, ~, ~, xOuter, yOuter, xInner, yInner] = deal(auxdata{:});
 
     nConstraintsSystem = 4;
     nConstraintsTriplet = 1;

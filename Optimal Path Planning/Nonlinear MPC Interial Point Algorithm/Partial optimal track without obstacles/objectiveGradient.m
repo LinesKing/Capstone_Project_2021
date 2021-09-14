@@ -8,7 +8,7 @@ function [g] = objectiveGradient(x,s,auxdata)
 %%%%    g: gradient of object function
 
     % Define constants
-    [N, nStates, weightDist, weightVel, weightTime] = deal(auxdata{1:5});
+    [N, nStates, weightDist, weightVel, weightAcc, weightTime] = deal(auxdata{1:6});
 
 
     % Generate gradadient of objective function:  
@@ -24,18 +24,24 @@ function [g] = objectiveGradient(x,s,auxdata)
             g(m+1,1) = 2*weightDist*(x(k+1)-x(k+1+nStates));
             g(m+2,1) = 2*weightVel*(x(k+2)-x(k+2+nStates));
             g(m+3,1) = 2*weightVel*(x(k+3)-x(k+3+nStates));
+            g(m+4,1) = 2*weightAcc*(x(k+4)-x(k+4+nStates));
+            g(m+5,1) = 2*weightAcc*(x(k+5)-x(k+5+nStates));
             g(m+6,1) = weightTime;
         elseif (i == N+1)
             g(m,1) = -2*weightDist*(x(k-nStates)-x(k));
             g(m+1,1) = -2*weightDist*(x(k+1-nStates)-x(k+1));
             g(m+2,1) = -2*weightVel*(x(k+2-nStates)-x(k+2));
             g(m+3,1) = -2*weightVel*(x(k+3-nStates)-x(k+3));
+            g(m+4,1) = -2*weightVel*(x(k+4-nStates)-x(k+4));
+            g(m+5,1) = -2*weightVel*(x(k+5-nStates)-x(k+5));
             g(m+6,1) = weightTime;
         else
             g(m,1) = -2*weightDist*(x(k-nStates)-x(k)) + 2*weightDist*(x(k)-x(k+nStates));
             g(m+1,1) = -2*weightDist*(x(k+1-nStates)-x(k+1)) + 2*weightDist*(x(k+1)-x(k+1+nStates));
             g(m+2,1) = -2*weightVel*(x(k+2-nStates)-x(k+2)) + 2*weightVel*(x(k+2)-x(k+2+nStates));
             g(m+3,1) = -2*weightVel*(x(k+3-nStates)-x(k+3)) + 2*weightVel*(x(k+3)-x(k+3+nStates));
+            g(m+4,1) = -2*weightVel*(x(k+4-nStates)-x(k+4)) + 2*weightVel*(x(k+4)-x(k+4+nStates));
+            g(m+5,1) = -2*weightVel*(x(k+5-nStates)-x(k+5)) + 2*weightVel*(x(k+5)-x(k+5+nStates));
             g(m+6,1) = weightTime;
         end
         m = m + nStates;

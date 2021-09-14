@@ -19,18 +19,29 @@ centerPoints = round(track_b.center,4);
 innerPoints = round(track_b.inner,4);
 outerPoints = round(track_b.outer,4);
 
+% Get part of track 
+%   (n = 1, m = 40: horizontal line);
+%   (n = 40, m = 81: curve);
+%   (n = 210, m = 235: vertical line);
+n = 1;
+m = 40;
+
+centerPoints = round(track_b.center(:,n:m),4);
+innerPoints = round(track_b.inner(:,n:m),4);
+outerPoints = round(track_b.outer(:,n:m),4);
+
 % Choose starting N point
 starting_N_point = 1;
 
 % Receeding Horizon
 % N = length(centerPoints)-1;
-N = 80-1;
+N = length(centerPoints)-1;
 ending_N_point = starting_N_point + N;
 
 % Enable warm start with center points
 warm = struct();
 warm.xWarm = centerPoints(1,starting_N_point:ending_N_point);
-warm.yWarm = centerPoints(2,starting_N_point:ending_N_point);
+warm.yWarm = centerPoints(2,starting_N_point:ending_N_point) + normrnd(0,0.001,[1,N+1]);
 
 % Extract inner and outer bounds
 % Note: Even though Receeding Horizon is N, we need to feed in N+1 terms, 

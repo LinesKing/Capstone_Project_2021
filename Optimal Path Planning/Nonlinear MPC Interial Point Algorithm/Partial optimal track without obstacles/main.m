@@ -15,32 +15,44 @@ close all;
 
 % Load track b
 load('../tracks/track_b.mat');
-centerPoints = round(track_b.center,4);
-innerPoints = round(track_b.inner,4);
-outerPoints = round(track_b.outer,4);
+
+% Get part of track 
+%   (n = 1, m = 40: horizontal line);
+%   (n = 40, m = 81: curve);
+%   (n = 210, m = 235: vertical line);
+n = 1;
+m = 80;
+
+centerPoints = round(track_b.center(:,n:m),4);
+innerPoints = round(track_b.inner(:,n:m),4);
+outerPoints = round(track_b.outer(:,n:m),4);
 
 % Choose starting N point
 starting_N_point = 1;
 
 % Receeding Horizon
-% N = length(centerPoints)-1;
-N = 40-1;
+N = length(centerPoints)-1;
 ending_N_point = starting_N_point + N;
 
 % Enable warm start with center points
-warm = struct();
-warm.tWarm = 0.1;
-warm.xWarm = centerPoints(1,starting_N_point:ending_N_point) + normrnd(0,0,[1,N+1]);
-warm.yWarm = centerPoints(2,starting_N_point:ending_N_point) + normrnd(0,0.002,[1,N+1]);
-warm.vxWarm = [diff(warm.xWarm) 0]/warm.tWarm;
-warm.vyWarm = [diff(warm.yWarm) 0]/warm.tWarm;
-warm.axWarm = [diff(warm.vxWarm) 0]/warm.tWarm;
-warm.ayWarm = [diff(warm.vyWarm) 0]/warm.tWarm;
+% warm = struct();
+% warm.tWarm = 0.002*ones(1,N+1);
+% warm.xWarm = centerPoints(1,starting_N_point:ending_N_point) + normrnd(0,0,[1,N+1]);
+% warm.yWarm = centerPoints(2,starting_N_point:ending_N_point) + normrnd(0,0.00,[1,N+1]);
+% warm.vxWarm = [diff(warm.xWarm) 0]./warm.tWarm;
+% warm.vyWarm = [diff(warm.yWarm) 0]./warm.tWarm;
+% warm.axWarm = [diff(warm.vxWarm) 0]./warm.tWarm;
+% warm.ayWarm = [diff(warm.vyWarm) 0]./warm.tWarm;
 
 % IPOPT solution as warm start
-% load('../warm_start/IPOPTsol_50to80.mat');
-% warm.xWarm = IPOPTsol_50to80.xPath;
-% warm.yWarm = IPOPTsol_50to80.yPath;
+load('../warm_start/IPOPTsol_1to80.mat');
+warm.tWarm = solution(starting_N_point:ending_N_point,7)';
+warm.xWarm = solution(starting_N_point:ending_N_point,1)' + normrnd(0,0.001,[1,N+1]);
+warm.yWarm = solution(starting_N_point:ending_N_point,2)' + normrnd(0,0.001,[1,N+1]);
+warm.vxWarm = solution(starting_N_point:ending_N_point,3)';
+warm.vyWarm = solution(starting_N_point:ending_N_point,4)';
+warm.axWarm = solution(starting_N_point:ending_N_point,5)';
+warm.ayWarm = solution(starting_N_point:ending_N_point,6)';
 
 % Extract inner and outer bounds
 % Note: Even though Receeding Horizon is N, we need to feed in N+1 terms, 
@@ -74,7 +86,6 @@ axis([min(min(xInner), min(xOuter)) ...
     max(max(xInner), max(xOuter)) ...
     min(min(yInner), min(yOuter)) ...
     max(max(yInner), max(yOuter))]);
-hold on
 
 % axis([-1.5 2 -2 2]) 
 % pause()
@@ -86,7 +97,7 @@ initPoint = [warm.xWarm(1), warm.yWarm(1), initAngle];
 
 % Solve optimal path
 profile on
-solution = TimeOptimalPathPlanning(xInnerMargin, yInnerMargin, xOuterMargin, yOuterMargin, warm, initPoint);
+[solution, ob_his]= TimeOptimalPathPlanning(xInnerMargin, yInnerMargin, xOuterMargin, yOuterMargin, warm, initPoint);
 profile viewer
 profile off
 
@@ -150,3 +161,8 @@ omegaPath = solution(:, 6);
 % title('Inputs')
 % ylabel("\omega [rad/s]")
 % grid on
+
+% Plot objective history
+figure(2)
+plot(ob_his);
+
