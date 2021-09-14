@@ -38,7 +38,7 @@ ending_N_point = starting_N_point + N;
 warm = struct();
 warm.tWarm = 0.1;
 warm.xWarm = centerPoints(1,starting_N_point:ending_N_point) + normrnd(0,0,[1,N+1]);
-warm.yWarm = centerPoints(2,starting_N_point:ending_N_point) + normrnd(0,0.01,[1,N+1]);
+warm.yWarm = centerPoints(2,starting_N_point:ending_N_point) + normrnd(0,0,[1,N+1]);
 
 warm.vxWarm = [diff(warm.xWarm) 0]/warm.tWarm;
 warm.vyWarm = [diff(warm.yWarm) 0]/warm.tWarm;

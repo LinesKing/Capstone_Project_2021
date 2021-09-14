@@ -16,9 +16,9 @@ function [chi] = OBCATimeOptimalPathPlanning(xInner, yInner, xOuter, yOuter, war
     prob.gamma = 0.5;
     prob.mu = 1;  % the initial barrier term
     prob.eta = 0.1;
-    prob.epsilon = 1e-8;
+    prob.epsilon = 1e-2;
     prob.inf = 1e8;
-
+    
     % maximum iterations
     prob.maxIter = 100;
 
@@ -30,7 +30,7 @@ function [chi] = OBCATimeOptimalPathPlanning(xInner, yInner, xOuter, yOuter, war
     N = length(xOuter) - 1;
 
     % Max time between points (Must be chosen to something physcally poissble)
-    tMax = 0.2; 
+    tMax = 0.5; 
     tMin = 1e-4;
 
     % Define state/input constraints
@@ -92,6 +92,8 @@ function [chi] = OBCATimeOptimalPathPlanning(xInner, yInner, xOuter, yOuter, war
         chiU = [chiU, tMax];
     end
 
+    chiL = chiL - prob.epsilon;
+    chiU = chiU + prob.epsilon;
     
     % 2. Initialise upper and lower bounds for constraints
     bL = [];
@@ -186,10 +188,10 @@ function [chi] = OBCATimeOptimalPathPlanning(xInner, yInner, xOuter, yOuter, war
     
     % 5. Prepare for iterations
     % Initial alpha for line search
-    alphaPr = 0.01;  % primal alpha
-    alphaDu = 0.01;  % dual alpha
-    alphaPrMax = 0.01;
-    alphaDuMax = 0.01;
+    alphaPr = 0.01*10;  % primal alpha
+    alphaDu = 0.01*10;  % dual alpha
+    alphaPrMax = 0.01*10;
+    alphaDuMax = 0.01*10;
     % Initialize iteration count
     iter = 0;
     % Print iteration zero
@@ -291,12 +293,19 @@ function [chi] = OBCATimeOptimalPathPlanning(xInner, yInner, xOuter, yOuter, war
             end
         end
 
-
         % Line search
         % Set alpha as approach to constraint
         alphaDu = min(alphaDu,alphaDuMax);
         alphaPr = min(alphaPr,alphaPrMax);
-            
+
+        % Compute new points
+        chiNew = chi + alphaPr * dchi';
+        if (ns>=1)
+            sNew = s + alphaPr * ds';
+        else
+            sNew = [];
+        end
+        
         % Predicted and actual reduction in the merit function
         pred = -alphaPr*g*[dchi;ds] - prob.gamma*alphaPr^2*[dchi;ds]'*H*[dchi;ds] + prob.nu*(norm(c',1)-norm(c'+alphaPr*J*[dchi;ds],1));
         ared = merit(prob,chi,chiL,chiU,s,bL,bU,auxdata) - merit(prob,chiNew,chiL,chiU,sNew,bL,bU,auxdata);  
@@ -307,8 +316,8 @@ function [chi] = OBCATimeOptimalPathPlanning(xInner, yInner, xOuter, yOuter, war
 
         while ared < prob.eta*pred 
             % reject point and move alpha_x
-            alphaPr = alphaPr * 0.5;
-            alphaDu = alphaDu * 0.5;
+            alphaPr = alphaPr * 0.9;
+            alphaDu = alphaDu * 0.9;
             % compute new points
             chiNew = chi + alphaPr * dchi';
             if (ns>=1)
@@ -333,17 +342,17 @@ function [chi] = OBCATimeOptimalPathPlanning(xInner, yInner, xOuter, yOuter, war
         end        
 
         % Compute acceptance point
-        chi = chi + alphaPr * dchi';
+        chi = chiNew;
         if (ns>=1)
-            s = s + alphaPr * ds';
+            s = sNew;
         else
             s = [];
         end
         lambda = lambda + alphaDu * dlambda';
         % Update zLNew and zUNew
         % update from direct solve approach
-        zL = zL + alphaDu * dzL';
-        zU = zU + alphaDu * dzU';
+        zL = zLNew;
+        zU = zUNew;
 
 
         % Check for convergence
@@ -379,8 +388,8 @@ function [chi] = OBCATimeOptimalPathPlanning(xInner, yInner, xOuter, yOuter, war
         
 
         % reset alpha
-        alphaPr = 0.01;
-        alphaDu = 0.01;
+        alphaPr = 0.01*10;
+        alphaDu = 0.01*10;
 
         % don't do a line search in this MATLAB version
         % just cycle through on another iteration with a lower alpha if

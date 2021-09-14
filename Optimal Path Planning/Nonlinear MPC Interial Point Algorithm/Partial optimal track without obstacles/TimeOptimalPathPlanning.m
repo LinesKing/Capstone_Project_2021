@@ -302,8 +302,8 @@ function [chi, ob_his] = TimeOptimalPathPlanning(xInner, yInner, xOuter, yOuter,
         else
             sNew = [];
         end
-        zLNew = zL + alphaDu * dzL';
-        zUNew = zU + alphaDu * dzU';
+%         zLNew = zL + alphaDu * dzL';
+%         zUNew = zU + alphaDu * dzU';
         
         % Predicted and actual reduction in the merit function
         pred = -alphaPr*g*[dchi;ds] - prob.gamma*alphaPr^2*[dchi;ds]'*[dchi;ds] + prob.nu*(norm(c',1)-norm(c'+alphaPr*J*[dchi;ds],1));
