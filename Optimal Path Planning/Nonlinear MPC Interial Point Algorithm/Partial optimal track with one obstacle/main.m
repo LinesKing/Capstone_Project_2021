@@ -21,7 +21,7 @@ load('../tracks/track_b.mat');
 %   (n = 40, m = 81: curve);
 %   (n = 210, m = 235: vertical line);
 n = 1;
-m = 20;
+m = 40;
 
 centerPoints = round(track_b.center(:,n:m),4);
 innerPoints = round(track_b.inner(:,n:m),4);
@@ -35,25 +35,35 @@ N = length(centerPoints)-1;
 ending_N_point = starting_N_point + N;
 
 % Enable warm start with center points
-warm = struct();
-warm.tWarm = 0.1;
-warm.xWarm = centerPoints(1,starting_N_point:ending_N_point) + normrnd(0,0,[1,N+1]);
-warm.yWarm = centerPoints(2,starting_N_point:ending_N_point) + normrnd(0,0,[1,N+1]);
-
-warm.vxWarm = [diff(warm.xWarm) 0]/warm.tWarm;
-warm.vyWarm = [diff(warm.yWarm) 0]/warm.tWarm;
-warm.vWarm = sqrt(warm.vxWarm.^2 + warm.vyWarm.^2);
-warm.thetaWarm = atan2(warm.vyWarm, warm.vxWarm);
-
-warm.axWarm = [diff(warm.vxWarm) 0]/warm.tWarm;
-warm.ayWarm = [diff(warm.vyWarm) 0]/warm.tWarm;
-warm.aWarm = sqrt(warm.axWarm.^2 + warm.ayWarm.^2);
-warm.omegaWarm = atan2(warm.ayWarm, warm.axWarm);
+% warm = struct();
+% warm.tWarm = 0.1;
+% warm.xWarm = centerPoints(1,starting_N_point:ending_N_point) + normrnd(0,0,[1,N+1]);
+% warm.yWarm = centerPoints(2,starting_N_point:ending_N_point) + normrnd(0,0,[1,N+1]);
+% 
+% warm.vxWarm = [diff(warm.xWarm) 0]/warm.tWarm;
+% warm.vyWarm = [diff(warm.yWarm) 0]/warm.tWarm;
+% warm.vWarm = sqrt(warm.vxWarm.^2 + warm.vyWarm.^2);
+% warm.thetaWarm = atan2(warm.vyWarm, warm.vxWarm);
+% 
+% warm.axWarm = [diff(warm.vxWarm) 0]/warm.tWarm;
+% warm.ayWarm = [diff(warm.vyWarm) 0]/warm.tWarm;
+% warm.aWarm = sqrt(warm.axWarm.^2 + warm.ayWarm.^2);
+% warm.omegaWarm = atan2(warm.ayWarm, warm.axWarm);
 
 % IPOPT solution as warm start
-% load('../warm_start/IPOPTsol_50to80.mat');
-% warm.xWarm = IPOPTsol_50to80.xPath;
-% warm.yWarm = IPOPTsol_50to80.yPath;
+load('../warm_start/IPOPTsol_with_obs1to40.mat');
+
+warm.xWarm = solution(starting_N_point:ending_N_point,1)' + normrnd(0,0.0015,[1,N+1]);
+warm.yWarm = solution(starting_N_point:ending_N_point,2)' + normrnd(0,0.0015,[1,N+1]);
+warm.vWarm = solution(starting_N_point:ending_N_point,3)';
+warm.thetaWarm = solution(starting_N_point:ending_N_point,4)';
+warm.aWarm = solution(starting_N_point:ending_N_point,5)';
+warm.omegaWarm = solution(starting_N_point:ending_N_point,6)';
+warm.lambda1Warm = solution(starting_N_point:ending_N_point,7)';
+warm.lambda2Warm = solution(starting_N_point:ending_N_point,8)';
+warm.lambda3Warm = solution(starting_N_point:ending_N_point,9)';
+warm.lambda4Warm = solution(starting_N_point:ending_N_point,10)';
+warm.tWarm = solution(starting_N_point:ending_N_point,11)';
 
 % Extract inner and outer bounds
 % Note: Even though Receeding Horizon is N, we need to feed in N+1 terms, 

@@ -68,7 +68,7 @@ function [chi] = OBCATimeOptimalPathPlanning(xInner, yInner, xOuter, yOuter, war
     for i = 1:N+1
         % Set initial start point to center of track (warm start)
         % [x, y, v, theta, a, omega, lambda1, lambda2, lambda3, lambda4, t]
-        chi = [chi, warm.xWarm(i), warm.yWarm(i), warm.vWarm(i), warm.thetaWarm(i), warm.aWarm(i), warm.omegaWarm(i), zeros(1, nObcaVariables), warm.tWarm];
+        chi = [chi, warm.xWarm(i), warm.yWarm(i), warm.vWarm(i), warm.thetaWarm(i), warm.aWarm(i), warm.omegaWarm(i), warm.lambda1Warm(i), warm.lambda2Warm(i), warm.lambda3Warm(i), warm.lambda4Warm(i), warm.tWarm(i)];
         % Upper and lower bounds of decision variables (box constraints)
         if (i == 1) % satisfy initial conditions contraint
             chiL = [chiL, [initPoint(1) initPoint(2) vMin thetaMin aMin omegaMin]];
@@ -188,10 +188,10 @@ function [chi] = OBCATimeOptimalPathPlanning(xInner, yInner, xOuter, yOuter, war
     
     % 5. Prepare for iterations
     % Initial alpha for line search
-    alphaPr = 0.01*10;  % primal alpha
-    alphaDu = 0.01*10;  % dual alpha
-    alphaPrMax = 0.01*10;
-    alphaDuMax = 0.01*10;
+    alphaPr = 0.01*20;  % primal alpha
+    alphaDu = 0.01*20;  % dual alpha
+    alphaPrMax = 0.01*20;
+    alphaDuMax = 0.01*20;
     % Initialize iteration count
     iter = 0;
     % Print iteration zero
@@ -356,12 +356,12 @@ function [chi] = OBCATimeOptimalPathPlanning(xInner, yInner, xOuter, yOuter, war
 
 
         % Check for convergence
-        sMax = 100; % > 1
-        sD = max(sMax,(sum(abs(lambda))+sum(abs(zL))+sum(abs(zU)))/(nc+2*(nchi+ns)));
-        sC = max(sMax,(sum(abs(zU))+sum(abs(zL)))/(2*(nchi+ns)));
+        sMax = 1000*N; % > 1
+        sD = max(1000*N,(sum(abs(lambda))+sum(abs(zL))+sum(abs(zU)))/(nc+2*(nchi+ns)));
+        sC = max(50*N,(sum(abs(zU))+sum(abs(zL)))/(2*(nchi+ns)));
 
         part(1) = max(abs(g' + J'*lambda' - zL' + zU'))/sD;
-        part(2) = max(abs(lambda'.*c));
+        part(2) = max(abs(lambda'.*c))/sC;
         part(3) = max(abs(diag([chi-chiL s-sL])*diag(zL)*e - prob.mu*e))/sC;
         part(4) = max(abs(diag([chiU-chi sU-s])*diag(zU)*e - prob.mu*e))/sC;
         eMu = max(part);        
@@ -388,8 +388,8 @@ function [chi] = OBCATimeOptimalPathPlanning(xInner, yInner, xOuter, yOuter, war
         
 
         % reset alpha
-        alphaPr = 0.01*10;
-        alphaDu = 0.01*10;
+        alphaPr = 0.01*20;
+        alphaDu = 0.01*20;
 
         % don't do a line search in this MATLAB version
         % just cycle through on another iteration with a lower alpha if

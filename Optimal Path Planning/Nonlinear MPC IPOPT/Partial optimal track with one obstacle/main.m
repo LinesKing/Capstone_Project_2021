@@ -20,8 +20,8 @@ load('../tracks/track_b.mat');
 %   (n = 1, m = 40: horizontal line);
 %   (n = 40, m = 81: curve);
 %   (n = 210, m = 235: vertical line);
-n = 210;
-m = 235;
+n = 1;
+m = 40;
 centerPoints = round(track_b.center(:,n:m),4);
 innerPoints = round(track_b.inner(:,n:m),4);
 outerPoints = round(track_b.outer(:,n:m),4);
@@ -78,10 +78,10 @@ hold on
 %% Obstacle constraints
 % Obstacle Parameters
 % Obstacle 1 for horizontal line
-% origin = [0.5, 0.65]';
-% theta = deg2rad(0);
-% length = 0.2;
-% width = 0.1;
+origin = [0.6, 0.64]';
+theta = deg2rad(0);
+length = 0.2;
+width = 0.1;
 
 % Obstacle 2 for curve
 % origin = [2.3, 0.3]';
@@ -90,10 +90,10 @@ hold on
 % width = 0.15;
 
 % Obstacle 3 for vertical line
-origin = [-1.35, -0.3]';
-theta = deg2rad(0);
-length = 0.15;
-width = 0.2;
+% origin = [-1.35, -0.3]';
+% theta = deg2rad(0);
+% length = 0.15;
+% width = 0.2;
 
 % Calculate Ax <= b
 object = struct();
