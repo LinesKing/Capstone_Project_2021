@@ -23,8 +23,8 @@ outerPoints = round(track_b.outer,4);
 %   (n = 1, m = 40: horizontal line);
 %   (n = 40, m = 81: curve);
 %   (n = 210, m = 235: vertical line);
-n = 1;
-m = 40;
+n = 191;
+m = 276;
 
 centerPoints = round(track_b.center(:,n:m),4);
 innerPoints = round(track_b.inner(:,n:m),4);

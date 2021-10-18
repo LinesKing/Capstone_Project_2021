@@ -114,9 +114,9 @@ dMin = 0.05;
 %% Plotting obstacle and track
 figure(1); 
 hold on; grid on;
-plotConvexRegion(-A1,-b1,[-1.5 -2],[2 2], 'g', 0.1)
-plotConvexRegion(-A2,-b2,[-1.5 -2],[2 2], 'g', 0.1)
-plotConvexRegion(-A3,-b3,[-1.5 -2],[2 2], 'g', 0.1)
+plotConvexRegion(-A1,-b1,[-1.5 -2],[2 2], 'r', 0.5)
+plotConvexRegion(-A2,-b2,[-1.5 -2],[2 2], 'r', 0.5)
+plotConvexRegion(-A3,-b3,[-1.5 -2],[2 2], 'r', 0.5)
 
 % Plot track bounds with margin
 margin = plot(xInnerMargin,yInnerMargin, '-.r');

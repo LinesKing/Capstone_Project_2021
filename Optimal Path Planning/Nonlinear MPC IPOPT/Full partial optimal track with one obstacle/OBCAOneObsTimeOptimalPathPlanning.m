@@ -1,4 +1,4 @@
-function [x] = OBCAOneObsTimeOptimalPathPlanning(xInner, yInner, xOuter, yOuter, warm, initPoint, object, dMin)
+function [x] = OBCAOneObsTimeOptimalPathPlanning(xInner, yInner, xOuter, yOuter, warm, initPoint, finalPoint, object, dMin)
 %%%% This function is to find the optimal path with OBCA method.
 %%%% Input:
 %%%% 	xInner - Inner bound of x
@@ -54,12 +54,17 @@ for i = 1:N+1
         options.lb = [options.lb, [initPoint(1) initPoint(2) vMin initPoint(3) aMin 0]]; %2D array with each row filled with column of vector current states
         options.ub = [options.ub, [initPoint(1) initPoint(2) vMax initPoint(3) aMax 0]];  
     else
-        yLb = min(yOuter(i),yInner(i));
-        yUb = max(yOuter(i),yInner(i));
-        xLb = min(xOuter(i),xInner(i));
-        xUb = max(xOuter(i),xInner(i));
-        options.lb = [options.lb, [xLb yLb vMin thetaMin aMin omegaMin]];
-        options.ub = [options.ub, [xUb yUb vMax thetaMax aMax omegaMax]]; 
+        if (i == N+1) % satisfy final conditions contraint
+            options.lb = [options.lb, [finalPoint(1) finalPoint(2) vMin finalPoint(3) aMin 0]]; %2D array with each row filled with column of vector current states
+            options.ub = [options.ub, [finalPoint(1) finalPoint(2) vMax finalPoint(3) aMax 0]];  
+        else
+            yLb = min(yOuter(i),yInner(i));
+            yUb = max(yOuter(i),yInner(i));
+            xLb = min(xOuter(i),xInner(i));
+            xUb = max(xOuter(i),xInner(i));
+            options.lb = [options.lb, [xLb yLb vMin thetaMin aMin omegaMin]];
+            options.ub = [options.ub, [xUb yUb vMax thetaMax aMax omegaMax]]; 
+        end
     end
    
     % Obstacle Constraints (lambda > 0)
