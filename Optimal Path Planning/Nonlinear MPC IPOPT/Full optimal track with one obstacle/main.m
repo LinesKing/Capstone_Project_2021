@@ -8,16 +8,16 @@ close all;
 
 %% Basic setting
 % Load track a
-% load('../tracks/track_a.mat');
-% centerPoints = round(track_a.center,4);
-% innerPoints = round(track_a.inner,4);
-% outerPoints = round(track_a.outer,4);
+load('../tracks/track_a.mat');
+centerPoints = round(track_a.center,4);
+innerPoints = round(track_a.inner,4);
+outerPoints = round(track_a.outer,4);
 
 % Load track b
-load('../tracks/track_b.mat');
-centerPoints = round(track_b.center,4);
-innerPoints = round(track_b.inner,4);
-outerPoints = round(track_b.outer,4);
+% load('../tracks/track_b.mat');
+% centerPoints = round(track_b.center,4);
+% innerPoints = round(track_b.inner,4);
+% outerPoints = round(track_b.outer,4);
 
 % Choose starting N point
 starting_N_point = 1;
@@ -52,7 +52,7 @@ end
 
 %% Obstacle constraints
 % % Obstacle Parameters
-origin = [-0.65, -0.98]';
+origin = [1.08, 0.17]';
 theta = deg2rad(0);
 length = 0.1;
 width = 0.1;

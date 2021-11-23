@@ -24,7 +24,6 @@ starting_N_point = 1;
 
 % Receeding Horizon
 % N = length(centerPoints)-1;
-N = 80-1;
 ending_N_point = starting_N_point + N;
 
 % Enable warm start with center points

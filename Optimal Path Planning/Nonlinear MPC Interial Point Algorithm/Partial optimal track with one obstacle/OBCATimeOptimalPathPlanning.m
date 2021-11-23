@@ -20,7 +20,7 @@ function [chi] = OBCATimeOptimalPathPlanning(xInner, yInner, xOuter, yOuter, war
     prob.inf = 1e8;
     
     % maximum iterations
-    prob.maxIter = 100;
+    prob.maxIter = 500;
 
     prob.tauMax = 0.01; % update tau
     prob.eTol = 1e-3;  % solution error tolerance

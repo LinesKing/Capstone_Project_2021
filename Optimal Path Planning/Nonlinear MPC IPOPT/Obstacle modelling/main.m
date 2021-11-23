@@ -15,10 +15,10 @@ close all;
 % width = 0.1;
 
 % Obstacle 2 for curve
-origin = [2.3, 0.3]';
-theta = deg2rad(60);
-length = 0.2;
-width = 0.15;
+origin = [1.08, 0.17]';
+theta = deg2rad(0);
+length = 0.1;
+width = 0.1;
 
 % Obstacle 3 for vertical line
 % origin = [-1.35, -0.3]';

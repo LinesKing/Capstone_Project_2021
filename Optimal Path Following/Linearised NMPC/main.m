@@ -101,7 +101,7 @@ uPred = repmat(u, 1, N+1); % guess for inputs across horizon
 
 % Specify Weights
 Q = 20*diag([1 1 0 0]); % [x weight, y weight, theta weight, v weight]
-R = 5*diag([1 1]); % [omega weight, a weight]
+R = 20*diag([1 1]); % [omega weight, a weight]
 
 % Test LTV MPC for different horizons
 % for n = 1:N
@@ -250,6 +250,5 @@ record.xiHis = xiHis;
 record.uHis = uHis;
 record.times = times;
 record.constr = constr;
-
-
+record.track = track;
 
